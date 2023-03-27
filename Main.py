@@ -24,9 +24,6 @@ def monte_carlo_simulation_with_bankruptcy(num_simulations, num_games, net_rewar
 
     return gain_history, bankruptcy_count
 
-        gain_history.append(total_gain)
-
-    return gain_history, bankruptcy_count
 
 def calculate_bankruptcy_probability(num_simulations, bankruptcy_count):
     return bankruptcy_count / num_simulations
