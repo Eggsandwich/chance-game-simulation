@@ -4,18 +4,27 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def monte_carlo_simulation(num_simulations, num_games, net_rewards, probabilities):
+def monte_carlo_simulation_with_bankruptcy(num_simulations, num_games, net_rewards, probabilities, starting_balance):
     gain_history = []
+    bankruptcy_count = 0
 
     for _ in range(num_simulations):
         total_gain = 0
+        balance = starting_balance
         for _ in range(num_games):
             gain = random.choices(net_rewards, probabilities)[0]
             total_gain += gain
+            balance += gain
+            if balance <= 0:
+                bankruptcy_count += 1
+                break
 
         gain_history.append(total_gain)
 
-    return gain_history
+    return gain_history, bankruptcy_count
+
+def calculate_bankruptcy_probability(num_simulations, bankruptcy_count):
+    return bankruptcy_count / num_simulations
 
 def calculate_expected_values(rewards, net_rewards, probabilities):
     expected_values = [net_reward * probability for net_reward, probability in zip(net_rewards, probabilities)]
@@ -73,7 +82,7 @@ def calculate_theoretical_max_streak(probability_of_win, num_games):
   
 def run_simulation():
     # Run the Monte Carlo simulation
-    gain_history = monte_carlo_simulation(num_simulations, num_games, net_rewards, probabilities)
+    gain_history, bankruptcy_count = monte_carlo_simulation_with_bankruptcy(num_simulations, num_games, net_rewards, probabilities, starting_balance)
 
     # Calculate and display the average gain per game from the simulation
     average_gain_per_game = np.mean(gain_history) / num_games
@@ -100,9 +109,13 @@ def run_simulation():
         print("Average Wins: ", avg_wins)
         print("Average Losses: ", avg_losses)
  
-        if display_max_wins_losses:
+    if display_max_wins_losses:
         print("Average Maximum Win Streak: ", avg_max_win_streak)
         print("Average Maximum Loss Streak: ", avg_max_loss_streak)
+
+    if display_bankruptcy_probability:
+        bankruptcy_probability = calculate_bankruptcy_probability(num_simulations, bankruptcy_count)
+        print("Bankruptcy Probability: ", bankruptcy_probability)
 
     if display_histogram:
         # Visualize the results using a histogram
@@ -124,6 +137,7 @@ def run_simulation():
 cost_per_game = 1000
 num_simulations = 1000
 num_games = 100
+starting_balance = 50000
 
 rewards = [0, 1000, 5000, 10000, 25000, 50000, 250000]
 probabilities = [0.48445, 0.45, 0.05, 0.01, 0.005, 0.0005, 0.00005]
@@ -154,6 +168,7 @@ display_total_wins_losses = True
 display_max_wins_losses = True
 display_theoretical_wins_losses = True
 display_theoretical_max_wins_losses = True
+display_bankruptcy_probability = True
 display_histogram = True
 
 # Run the simulation and display the results
