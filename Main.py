@@ -14,7 +14,7 @@ def monte_carlo_simulation_with_bankruptcy(num_simulations, num_games, net_rewar
         for _ in range(num_games):
             gain = random.choices(net_rewards, probabilities)[0]
             total_gain += gain
-            balance += gain
+            balance += gain - cost_per_game  # subtract the cost of playing the game
             if balance <= 0:
                 bankruptcy_count += 1
                 break
